@@ -133,17 +133,17 @@ public class ConceptWebcam extends LinearOpMode {
             telemetry.clear();
             telemetry.addData(">", "Started...Press 'A' to capture frame");
 
-            boolean buttonPressSeen = false;
-            boolean captureWhenAvailable = false;
-            while (opModeIsActive()) {
+                    boolean buttonPressSeen = false;
+                    boolean captureWhenAvailable = false;
+                    while (opModeIsActive()) {
 
-                boolean buttonIsPressed = gamepad1.a;
-                if (buttonIsPressed && !buttonPressSeen) {
-                    captureWhenAvailable = true;
-                }
-                buttonPressSeen = buttonIsPressed;
+                        boolean buttonIsPressed = gamepad1.a;
+                        if (buttonIsPressed && !buttonPressSeen) {
+                            captureWhenAvailable = true;
+                        }
+                        buttonPressSeen = buttonIsPressed;
 
-                if (captureWhenAvailable) {
+                        if (captureWhenAvailable) {
                     Bitmap bmp = frameQueue.poll();
                     if (bmp != null) {
                         captureWhenAvailable = false;

@@ -92,11 +92,29 @@ public class Drive_Base_Linear extends LinearOpMode {
             double  G1LeftStickX  = reverseControls * gamepad1.left_stick_x;
             double  G1RightStickX = reverseControls * gamepad1.right_stick_x;
 
-            // strafe Mode (allows sideways motion)
-            backRightDrive.setPower(-G1LeftStickX + G1RightStickX + G1LeftStickY); //Sets power of the back right motor depending on left stick and x-axis right stick
-            backLeftDrive.setPower(-G1LeftStickX + G1RightStickX - G1LeftStickY); //Sets power of the back left motor depending on left stick and x-axis right stick
-            frontLeftDrive.setPower(-G1LeftStickX - G1RightStickX + G1LeftStickY); //Sets power of the front left motor depending on left stick and x-axis right stick
-            frontRightDrive.setPower(-G1LeftStickX - G1RightStickX - G1LeftStickY); //Sets power of the front right motor depending on left stick and x-axis right stick
+            double frontLeftPower = (-G1LeftStickX - G1RightStickX + G1LeftStickY);
+            double frontRightPower = -G1LeftStickX - G1RightStickX - G1LeftStickY;
+            double backLeftPower = -G1LeftStickX + G1RightStickX - G1LeftStickY;
+            double backRightPower = -G1LeftStickX + G1RightStickX + G1LeftStickY;
+
+            double maxVal = Math.max(Math.abs(frontLeftPower),Math.max(Math.abs(frontRightPower),Math.max(Math.abs(backLeftPower),Math.abs(backRightPower))));
+            if(maxVal > 1)
+            {
+                frontLeftPower = frontLeftPower / maxVal;
+                frontRightPower = frontRightPower / maxVal;
+                backRightPower = backRightPower / maxVal;
+                backLeftPower = backLeftPower / maxVal;
+            }
+
+                    // strafe Mode (allows sideways motion)
+            backRightDrive.setPower(backRightPower); //Sets power of the back right motor depending on left stick and x-axis right stick
+            backLeftDrive.setPower(backLeftPower); //Sets power of the back left motor depending on left stick and x-axis right stick
+            frontLeftDrive.setPower(frontLeftPower); //Sets power of the front left motor depending on left stick and x-axis right stick
+            frontRightDrive.setPower(frontRightPower); //Sets power of the front right motor depending on left stick and x-axis right stick
+
+            telemetry.addData("Front Left Power ", (-G1LeftStickX+G1RightStickX+G1LeftStickY));
+
+
 
             //Power of motors should be -1<power<1
             //Someone should draw a diagram at some point that'd probably help
