@@ -106,7 +106,7 @@ public class Drive_Base_Linear extends LinearOpMode {
                 backLeftPower = backLeftPower / maxVal;
             }
 
-                    // strafe Mode (allows sideways motion)
+            // strafe Mode (allows sideways motion)
             backRightDrive.setPower(backRightPower); //Sets power of the back right motor depending on left stick and x-axis right stick
             backLeftDrive.setPower(backLeftPower); //Sets power of the back left motor depending on left stick and x-axis right stick
             frontLeftDrive.setPower(frontLeftPower); //Sets power of the front left motor depending on left stick and x-axis right stick

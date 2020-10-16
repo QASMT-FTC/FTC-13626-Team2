@@ -27,17 +27,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 /**
  * This 2020-2021 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -49,9 +51,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
-public class ConceptTensorFlowObjectDetection extends LinearOpMode {
+@TeleOp(name = "Auto Default", group = "Linear Opmode")
+public class AutonomousFull extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
@@ -69,7 +70,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+            "AZrcPbL/////AAABmQ7qhHnAOkQDjFldRi+1gXdnIol7PdUHJo1OJXAy+0C23VNo6+UBdsRdJFEpeeHMUjDZgvflIkS92jUqHhtdckNsnbBDGUBjVC5NRweYFvtc9pKmNGwgQLYvKSZwdwBKWhx/i4rYJgWItX0JEcv9lsQ6VzJChbO3VwCyxnwRylI/HkQk21nYDhHaURDE0ogSr8GqDYnoE3F9h5fw/ll0wr5rWSgyxfcsEWg3YvBigLVyzhO/zXwA+4Og98pGaOW9mhTD78B1W0P4NUGD6ywdGP7j9uDepld/wDueVykgqHR8xcZ6VXc7DlkKOHgk8Zr6HqMUzDDsMX457wwFRbDWkYJiIyzXuO7jlpZNQ+mRqvoF";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -111,29 +112,6 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-
-        while (opModeIsActive()) {
-            if (tfod != null) {
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-
-                    // step through the list of recognitions and display boundary info.
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                    }
-                    telemetry.update();
-                }
-            }
-        }
-
         waitForStart();
 
         if (opModeIsActive()) {
@@ -144,7 +122,6 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
-
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
                         for (Recognition recognition : updatedRecognitions) {
@@ -175,7 +152,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = CameraDirection.BACK;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -188,7 +165,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.8f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
