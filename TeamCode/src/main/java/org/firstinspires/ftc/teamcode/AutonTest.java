@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="AutonTest", group="Linear Opmode")
+@Autonomous(name="AutonTest", group="Linear Opmode")
 //@Disabled
 public class AutonTest extends LinearOpMode {
 
@@ -24,6 +24,7 @@ public class AutonTest extends LinearOpMode {
 
     public void goForwardSetDist(int dist)
     {
+        dist = dist / 2; //Gearing compensation
         frontLeftDrive.setTargetPosition(dist);
         frontRightDrive.setTargetPosition(dist);
         backLeftDrive.setTargetPosition(dist);
@@ -47,6 +48,20 @@ public class AutonTest extends LinearOpMode {
         backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    public int mmPulse(int mmDist)
+    {
+        int pulseDist;
+        pulseDist = (int) (mmDist / 0.07055555535799998);
+        return pulseDist;
+    }
+
+    public int turnLeft(int degrees) //For turning degrees
+    {
+        int pulseDist;
+        //Assuming 1 diameter sideways per 1440 ticks
+        //Placehold
+    }
+
     @Override
 
     public void runOpMode() {
@@ -66,10 +81,10 @@ public class AutonTest extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE); //Sets the
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD); //Sets the
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         //The motor direction is what direction the wheel spins for a given power.
         //Direction.reverse causes the wheel to spin -1 when given input 1, 0 when given 0, 1 when given -1, etc.
@@ -81,12 +96,12 @@ public class AutonTest extends LinearOpMode {
         waitForStart();
         runtime.reset();
         encoderReset();
-        frontLeftDrive.setPower(1);
-        frontRightDrive.setPower(1);
-        backLeftDrive.setPower(1);
-        backRightDrive.setPower(1);
+        frontLeftDrive.setPower(0.3);
+        frontRightDrive.setPower(0.3);
+        backLeftDrive.setPower(0.3);
+        backRightDrive.setPower(0.3);
         //In Run_To_Position (RTP) mode, the power is to define the power of the motors once run, not to immediately set the powers of the motors themselves.
-        goForwardSetDist(100);
+        goForwardSetDist(mmPulse(50));
         positionRun();
 
 
@@ -108,7 +123,15 @@ Password:
 Machina1
 
 1440 pulses per motor rotation
-Wheel diameter 4 inch
-gearing - unknown
+Wheel diameter 4 inch; 10.16 cm
+gearing - 2:1
+Length of bot: 45 cm
+Width of bot: 40 cm
+Turning circle radius: 30.1 cm
+Turning circle circumference: 189.1 cm
+One rotation of wheels turns 10.16 cm, 10.16 / 189.1 = 5.61% of a full turn = 18.576 degrees approx.
+In order
+
+//Test propulsion per reverse strafe
 multiply rotations of wheel, taking into account gearing, by diameter to determine distance per pulse roughly. (This'll probably only apply well >1000 pulses)
  */

@@ -32,7 +32,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @TeleOp(name="Drive_Base_Linear", group="Linear Opmode")
@@ -42,15 +48,22 @@ public class Drive_Base_Linear extends LinearOpMode {
     // Declare OpMode members
     private ElapsedTime runtime = new ElapsedTime();
     // 152 rpm
-    private DcMotor frontLeftDrive = null; //Initialises the private DcMotor objects
-    // 152 rpm                               With null variables, assignment comes later
+    private DcMotor frontLeftDrive = null;
+    // 152 rpm
     private DcMotor frontRightDrive = null;
     // 100 rpm
     private DcMotor backLeftDrive = null;
     // 100 rpm
     private DcMotor backRightDrive = null;
 
-    private double reverseControls = 1;
+    private DcMotor wobbleMotor = null;
+
+    private Servo servo;
+
+    int wobblePos = 0;
+
+
+    private double reverseControls = 0.5;
 
     @Override
     public void runOpMode() {
@@ -64,6 +77,9 @@ public class Drive_Base_Linear extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
         backLeftDrive  = hardwareMap.get(DcMotor.class, "backLeftDrive");
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
+        wobbleMotor = hardwareMap.get(DcMotor.class, "wobbleMotor");
+        servo = hardwareMap.servo.get("servo");
+
         //The DcMotor class contains the methods required for setting a direction of the motor spin,
 
 
@@ -92,6 +108,11 @@ public class Drive_Base_Linear extends LinearOpMode {
             double  G1LeftStickX  = reverseControls * gamepad1.left_stick_x;
             double  G1RightStickX = reverseControls * gamepad1.right_stick_x;
 
+            double liftPower;
+            int sensitivity = 720; //360 will move from 0 to 90 degrees in joystick position 0 to 1.
+            // YOU MAY NEED TO CHANGE THE DIRECTION OF THIS STICK. RIGHT NOW IT IS NEGATIVE.
+            double liftStick = -gamepad2.left_stick_y;
+
             double frontLeftPower = (-G1LeftStickX - G1RightStickX + G1LeftStickY);
             double frontRightPower = -G1LeftStickX - G1RightStickX - G1LeftStickY;
             double backLeftPower = -G1LeftStickX + G1RightStickX - G1LeftStickY;
@@ -113,32 +134,41 @@ public class Drive_Base_Linear extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower); //Sets power of the front right motor depending on left stick and x-axis right stick
 
             telemetry.addData("Front Left Power ", (-G1LeftStickX+G1RightStickX+G1LeftStickY));
-
-
-
-            //Power of motors should be -1<power<1
-            //Someone should draw a diagram at some point that'd probably help
-
-            //Y axis of right stick is unused, frees up for potential 4th type of movement and/or possible 3d movement
-
             // Reverse controls with the x button
             if (gamepad1.x){
-                reverseControls = -reverseControls; //Sets reverse controls to invert the input from all the sticks (multiplies by -1)
+                reverseControls = -reverseControls;
                 telemetry.addData("Controls Status", "Direction: " + reverseControls);
             }
 
             // SLOW mode and FAST mode. Works by halving the reverseControls variable
-            if (gamepad1.y){ //When  gamepad y button is pressed, activates slow mode, works as a toggle switch
-                if(reverseControls == 1 || reverseControls == -1){ //Toggles to slow mode only if fast (normal) mode is already on
+            if (gamepad1.y){
+                if(reverseControls == 0.5 || reverseControls == -0.5){
                     reverseControls = reverseControls*0.5;
                     telemetry.addData("Controls Status", "SLOW MODE");
                 }
-                else if(reverseControls == 0.5 || reverseControls == -0.5){ //Sets reverse controls modifier back to 1, fast mode is actually default mode
+                else if(reverseControls == 0.25 || reverseControls == -0.25){
                     reverseControls = reverseControls*2;
                     telemetry.addData("Controls Status", "FAST MODE");
                 }
                 telemetry.update();
             }
+
+            if(gamepad2.a){
+                servo.setPosition(0.5);
+            }
+            if(gamepad2.b){
+                servo.setPosition(0);
+            }
+
+            liftPower = Range.clip(liftStick, -1.0, 0) ;
+
+            wobblePos += (int)liftStick*sensitivity;
+            wobblePos = Range.clip(wobblePos, 0, 720);
+
+            // MOVES UP FROM POSITION 0 TO 90 DEGREES UP.
+            wobbleMotor.setTargetPosition(wobblePos);
+            wobbleMotor.setPower(0.05);
+            wobbleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -146,3 +176,4 @@ public class Drive_Base_Linear extends LinearOpMode {
         }
     }
 }
+
