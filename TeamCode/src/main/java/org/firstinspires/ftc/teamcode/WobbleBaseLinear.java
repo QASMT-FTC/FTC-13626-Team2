@@ -80,7 +80,7 @@ public class WobbleBaseLinear extends LinearOpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
         wobbleMotor = hardwareMap.get(DcMotor.class, "wobbleMotor");
         servo = hardwareMap.servo.get("servo");
-        intakeMotor = hardwareMap.get(DcMotor.class)
+        intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         //The DcMotor class contains the methods required for setting a direction of the motor spin,
 
