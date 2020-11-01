@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-666067946/FTC-13626-Team2.iml" filepath="$PROJECT_DIR$/.idea/modules/-666067946/FTC-13626-Team2.iml" group="FTC-13626-Team2" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1681265194/FtcRobotController.iml" filepath="$PROJECT_DIR$/.idea/modules/1681265194/FtcRobotController.iml" group="FTC-13626-Team2/FtcRobotController" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/TeamCode.iml" filepath="$PROJECT_DIR$/.idea/TeamCode.iml" group="FTC-13626-Team2/TeamCode" />
+    </modules>
+  </component>
+</project>

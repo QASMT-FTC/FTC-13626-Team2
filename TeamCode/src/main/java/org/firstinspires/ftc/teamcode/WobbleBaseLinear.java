@@ -58,11 +58,17 @@ public class WobbleBaseLinear extends LinearOpMode {
 
     private DcMotor wobbleMotor = null;
 
-    private Servo servo;
-
     private DcMotor intakeMotor = null;
 
+    private DcMotor fireMotor = null;
+
+    private Servo wobbleServo;
+
+    private Servo ringServo;
+
     int wobblePos = 0;
+
+    int ringPos = 0;
 
     private double reverseControls = 1;
 
@@ -79,18 +85,28 @@ public class WobbleBaseLinear extends LinearOpMode {
         backLeftDrive  = hardwareMap.get(DcMotor.class, "backLeftDrive");
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
         wobbleMotor = hardwareMap.get(DcMotor.class, "wobbleMotor");
-        servo = hardwareMap.servo.get("servo");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        fireMotor = hardwareMap.get(DcMotor.class, "fireMotor");
+        wobbleServo = hardwareMap.servo.get("wobbleServo");
+        ringServo = hardwareMap.servo.get("ringServo");
+
 
         //The DcMotor class contains the methods required for setting a direction of the motor spin,
 
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD); //Sets the
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE); //Sets the
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //Sets the
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        wobbleMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
 
         //The motor direction is what direction the wheel spins for a given power.
         //Direction.reverse causes the wheel to spin -1 when given input 1, 0 when given 0, 1 when given -1, etc.
@@ -111,9 +127,10 @@ public class WobbleBaseLinear extends LinearOpMode {
             double  G1RightStickX = reverseControls * gamepad1.right_stick_x;
 
             double liftPower;
-            int sensitivity = 720; //360 will move from 0 to 90 degrees in joystick position 0 to 1.
+            int sensitivity = 1; //360 will move from 0 to 90 degrees in joystick position 0 to 1.
             // YOU MAY NEED TO CHANGE THE DIRECTION OF THIS STICK. RIGHT NOW IT IS NEGATIVE.
             double liftStick = -gamepad2.left_stick_y;
+            double rightStick = -gamepad2.right_stick_y;
 
             double frontLeftPower = (-G1LeftStickX - G1RightStickX + G1LeftStickY);
             double frontRightPower = -G1LeftStickX - G1RightStickX - G1LeftStickY;
@@ -142,11 +159,11 @@ public class WobbleBaseLinear extends LinearOpMode {
 
             // SLOW mode and FAST mode. Works by halving the reverseControls variable
             if (gamepad1.y){
-                if(reverseControls == 1 || reverseControls == -1){
+                if(reverseControls == 0.5 || reverseControls == -0.5){
                     reverseControls = reverseControls*0.5;
                     telemetry.addData("Controls Status", "SLOW MODE");
                 }
-                else if(reverseControls == 0.5 || reverseControls == -0.5){
+                else if(reverseControls == 0.25 || reverseControls == -0.25){
                     reverseControls = reverseControls*2;
                     telemetry.addData("Controls Status", "FAST MODE");
                 }
@@ -154,20 +171,39 @@ public class WobbleBaseLinear extends LinearOpMode {
             }
 
             if(gamepad2.a){
-                servo.setPosition(0.5);
+                wobbleServo.setPosition(1);
             }
             if(gamepad2.b){
-                servo.setPosition(0);
+                wobbleServo.setPosition(0.5);
             }
 
+            if(gamepad2.x)
+            {
+                ringServo.setPosition(0.7);
+            }
+            else
+            {
+                ringServo.setPosition(1);
+            }
 
             wobblePos += (int)liftStick*sensitivity;
             wobblePos = Range.clip(wobblePos, 0, 700);
 
             // MOVES UP FROM POSITION 0 TO 90 DEGREES UP.
-            wobbleMotor.setTargetPosition(-wobblePos);
-            wobbleMotor.setPower(0.1);
+            wobbleMotor.setTargetPosition(wobblePos);
+            wobbleMotor.setPower(0.5);
             wobbleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+
+            //ringPos += (int)rightStick*sensitivity;
+            //ringPos = Range.clip(ringPos, 0, 700);
+
+            // MOVES UP FROM POSITION 0 TO 90 DEGREES UP.
+            //intakeMotor.setTargetPosition(-ringPos);
+            intakeMotor.setPower(gamepad2.left_trigger);
+            fireMotor.setPower(-gamepad2.right_trigger);
+            //intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());

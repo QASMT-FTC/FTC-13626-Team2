@@ -60,6 +60,7 @@ public class AutonTest extends LinearOpMode {
         int pulseDist;
         //Assuming 1 diameter sideways per 1440 ticks
         //Placehold
+        return 0;
     }
 
     @Override

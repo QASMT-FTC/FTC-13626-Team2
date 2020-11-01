@@ -78,7 +78,7 @@ public class Drive_Base_Linear extends LinearOpMode {
         backLeftDrive  = hardwareMap.get(DcMotor.class, "backLeftDrive");
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
         wobbleMotor = hardwareMap.get(DcMotor.class, "wobbleMotor");
-        servo = hardwareMap.servo.get("servo");
+        //servo = hardwareMap.servo.get("servo");
 
         //The DcMotor class contains the methods required for setting a direction of the motor spin,
 
