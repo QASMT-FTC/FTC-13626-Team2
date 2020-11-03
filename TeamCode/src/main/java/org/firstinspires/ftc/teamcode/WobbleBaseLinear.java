@@ -62,6 +62,8 @@ public class WobbleBaseLinear extends LinearOpMode {
 
     private DcMotor fireMotor = null;
 
+    private DcMotor ringMotor = null;
+
     private Servo wobbleServo;
 
     private Servo ringServo;
@@ -70,7 +72,7 @@ public class WobbleBaseLinear extends LinearOpMode {
 
     int ringPos = 0;
 
-    private double reverseControls = 1;
+    private double reverseControls = 0.5;
 
     @Override
     public void runOpMode() {
@@ -87,6 +89,7 @@ public class WobbleBaseLinear extends LinearOpMode {
         wobbleMotor = hardwareMap.get(DcMotor.class, "wobbleMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         fireMotor = hardwareMap.get(DcMotor.class, "fireMotor");
+        ringMotor = hardwareMap.get(DcMotor.class, "ringMotor");
         wobbleServo = hardwareMap.servo.get("wobbleServo");
         ringServo = hardwareMap.servo.get("ringServo");
 
@@ -105,6 +108,7 @@ public class WobbleBaseLinear extends LinearOpMode {
         frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fireMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         wobbleMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
 
@@ -126,7 +130,6 @@ public class WobbleBaseLinear extends LinearOpMode {
             double  G1LeftStickX  = reverseControls * gamepad1.left_stick_x;
             double  G1RightStickX = reverseControls * gamepad1.right_stick_x;
 
-            double liftPower;
             int sensitivity = 1; //360 will move from 0 to 90 degrees in joystick position 0 to 1.
             // YOU MAY NEED TO CHANGE THE DIRECTION OF THIS STICK. RIGHT NOW IT IS NEGATIVE.
             double liftStick = -gamepad2.left_stick_y;
@@ -179,31 +182,34 @@ public class WobbleBaseLinear extends LinearOpMode {
 
             if(gamepad2.x)
             {
+                //open position
                 ringServo.setPosition(0.7);
             }
             else
             {
+                //under the rings
                 ringServo.setPosition(1);
             }
 
+            //Moves wobble goal arm up
             wobblePos += (int)liftStick*sensitivity;
             wobblePos = Range.clip(wobblePos, 0, 700);
-
-            // MOVES UP FROM POSITION 0 TO 90 DEGREES UP.
             wobbleMotor.setTargetPosition(wobblePos);
             wobbleMotor.setPower(0.5);
             wobbleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+            //Moves ring flippy arm up
+            ringPos += (int)rightStick*sensitivity;
+            ringPos = Range.clip(ringPos, 0, 700);
+            ringMotor.setTargetPosition(-ringPos);
+            ringMotor.setPower(0.5);
+            ringMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
-            //ringPos += (int)rightStick*sensitivity;
-            //ringPos = Range.clip(ringPos, 0, 700);
-
-            // MOVES UP FROM POSITION 0 TO 90 DEGREES UP.
-            //intakeMotor.setTargetPosition(-ringPos);
+            //mama-mi-a-pasta wheels
             intakeMotor.setPower(gamepad2.left_trigger);
+
+            //The spinny shooty one
             fireMotor.setPower(-gamepad2.right_trigger);
-            //intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
