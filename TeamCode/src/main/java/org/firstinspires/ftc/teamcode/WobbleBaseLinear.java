@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -68,6 +69,10 @@ public class WobbleBaseLinear extends LinearOpMode {
 
     private Servo ringServo;
 
+    private Servo grabServo;
+
+    private Servo aimServo;
+
     int wobblePos = 0;
 
     int ringPos = 0;
@@ -92,7 +97,8 @@ public class WobbleBaseLinear extends LinearOpMode {
         ringMotor = hardwareMap.get(DcMotor.class, "ringMotor");
         wobbleServo = hardwareMap.servo.get("wobbleServo");
         ringServo = hardwareMap.servo.get("ringServo");
-
+        grabServo = hardwareMap.servo.get("grabServo");
+        aimServo = hardwareMap.servo.get("aimServo");
 
         //The DcMotor class contains the methods required for setting a direction of the motor spin,
 
@@ -111,6 +117,7 @@ public class WobbleBaseLinear extends LinearOpMode {
         fireMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         wobbleMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        //intakeMotor.setMode(DcMotor.RunMode.RESET_ENCODERS);
 
         //The motor direction is what direction the wheel spins for a given power.
         //Direction.reverse causes the wheel to spin -1 when given input 1, 0 when given 0, 1 when given -1, etc.
@@ -133,7 +140,8 @@ public class WobbleBaseLinear extends LinearOpMode {
             int sensitivity = 1; //360 will move from 0 to 90 degrees in joystick position 0 to 1.
             // YOU MAY NEED TO CHANGE THE DIRECTION OF THIS STICK. RIGHT NOW IT IS NEGATIVE.
             double liftStick = -gamepad2.left_stick_y;
-            double rightStick = -gamepad2.right_stick_y;
+            //boolean rightBumper = gamepad1.right_bumper;
+            //boolean leftBumper = gamepad1.left_bumper;
 
             double frontLeftPower = (-G1LeftStickX - G1RightStickX + G1LeftStickY);
             double frontRightPower = -G1LeftStickX - G1RightStickX - G1LeftStickY;
@@ -191,24 +199,84 @@ public class WobbleBaseLinear extends LinearOpMode {
                 ringServo.setPosition(1);
             }
 
+            if(gamepad1.right_trigger > 0)
+            {
+                grabServo.setPosition(0.5);
+            }
+            else
+                grabServo.setPosition(0.8);
+
             //Moves wobble goal arm up
             wobblePos += (int)liftStick*sensitivity;
             wobblePos = Range.clip(wobblePos, 0, 700);
             wobbleMotor.setTargetPosition(wobblePos);
-            wobbleMotor.setPower(0.5);
+            wobbleMotor.setPower(1);
             wobbleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             //Moves ring flippy arm up
-            ringPos += (int)rightStick*sensitivity;
-            ringPos = Range.clip(ringPos, 0, 700);
-            ringMotor.setTargetPosition(-ringPos);
-            ringMotor.setPower(0.5);
-            ringMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            if (gamepad1.b)
+            {
+                ringPos-=3;
+            }
+            if (gamepad1.a){
+                ringPos+=3;
+            }
+            intakeMotor.setTargetPosition(ringPos);
+            intakeMotor.setPower(1);
+            intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            double pos = aimServo.getPosition();
+            if(gamepad2.left_bumper)
+            {
+                aimServo.setPosition(pos += 0.05);
+            }
+            if (gamepad2.right_bumper)
+            {
+                aimServo.setPosition(pos -= 0.05);
+            }
+
+
+            /*if(gamepad1.b)
+            {
+                ringPos = 575;
+                intakeMotor.setTargetPosition(-ringPos);
+                intakeMotor.setPower(1);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+            else if (gamepad1.a)
+            {
+                intakeMotor.setTargetPosition(0);
+                intakeMotor.setPower(1);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }*/
+
+
 
             //mama-mi-a-pasta wheels
-            intakeMotor.setPower(gamepad2.left_trigger);
+            //intakeMotor.setPower(gamepad2.left_trigger);
 
             //The spinny shooty one
+            double fireMod;
+            if(gamepad2.dpad_up)
+            {
+                fireMod = 1;
+            }
+            else if(gamepad2.dpad_left)
+            {
+                fireMod = 0.85;
+            }
+            else if(gamepad2.dpad_down)
+            {
+                fireMod = 0.6;
+            }
+            else if(gamepad2.dpad_right)
+            {
+                fireMod = 0.75;
+            }
+            else
+            {
+                fireMod = 0.5;
+            }
             fireMotor.setPower(-gamepad2.right_trigger);
 
             // Show the elapsed game time and wheel power.
